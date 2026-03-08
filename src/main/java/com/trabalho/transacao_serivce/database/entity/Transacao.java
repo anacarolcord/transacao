@@ -8,16 +8,19 @@ import lombok.Getter;
 import lombok.Setter;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Getter
 @Setter
 @Builder
+@Document(collection = "faturas")
 public class Transacao {
     @Id
-    private ObjectId idTransacao;
+    private UUID idTransacao;
     private Long idUsuario;
     private BigDecimal valor;
     private LocalDateTime dataCriacao;
