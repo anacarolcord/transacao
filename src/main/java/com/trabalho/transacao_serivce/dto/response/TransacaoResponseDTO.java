@@ -1,5 +1,6 @@
 package com.trabalho.transacao_serivce.dto.response;
 
+import com.trabalho.transacao_serivce.database.entity.StatusTransacao;
 import com.trabalho.transacao_serivce.database.entity.enums.TipoConta;
 import com.trabalho.transacao_serivce.database.entity.enums.TipoTransacao;
 import lombok.Builder;
@@ -8,14 +9,16 @@ import org.bson.types.ObjectId;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Getter
 @Builder
 public class TransacaoResponseDTO {
-    private ObjectId idTransacao;
+    private UUID idTransacao;
     private Long idUsuario;
     private BigDecimal valor;
     private LocalDateTime dataCriacao;
     private TipoTransacao tipoTransacao;
     private TipoConta tipoConta;
+    private StatusTransacao statusTransacao;
 }

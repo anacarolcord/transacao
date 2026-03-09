@@ -6,7 +6,6 @@ import com.trabalho.transacao_serivce.database.entity.enums.TipoTransacao;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -26,4 +25,5 @@ public class Transacao {
     private LocalDateTime dataCriacao;
     private TipoTransacao tipoTransacao;
     private TipoConta tipoConta;
+    private StatusTransacao statusTransacao;
 }

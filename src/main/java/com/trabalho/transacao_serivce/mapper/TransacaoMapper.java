@@ -1,5 +1,6 @@
 package com.trabalho.transacao_serivce.mapper;
 
+import com.trabalho.transacao_serivce.database.entity.StatusTransacao;
 import com.trabalho.transacao_serivce.database.entity.Transacao;
 import com.trabalho.transacao_serivce.dto.request.TransacaoRequestDTO;
 import com.trabalho.transacao_serivce.dto.response.TransacaoResponseDTO;
@@ -15,7 +16,7 @@ public final class TransacaoMapper {
                 .idUsuario(request.getIdUsuario())
                 .tipoConta(request.getTipoConta())
                 .dataCriacao(LocalDateTime.now())
-                .build();
+                .statusTransacao(StatusTransacao.PROCESSANDO).build();
     }
 
     public static TransacaoResponseDTO toResponse(Transacao transacao){
@@ -26,6 +27,7 @@ public final class TransacaoMapper {
                 .tipoTransacao(transacao.getTipoTransacao())
                 .tipoConta(transacao.getTipoConta())
                 .dataCriacao(transacao.getDataCriacao())
+                .statusTransacao(transacao.getStatusTransacao())
                 .build();
     }
 }
