@@ -15,6 +15,7 @@ public class TransacaoService {
 
     public TransacaoResponseDTO enviaTransacao(TransacaoRequestDTO request){
 
+
     }
 
     public boolean verificaSaldoNoRedis(BigDecimal valorTransacao){
