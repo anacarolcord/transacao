@@ -1,6 +1,7 @@
 package com.trabalho.transacao_serivce.database.entity;
 
 
+import com.trabalho.transacao_serivce.database.entity.enums.StatusTransacao;
 import com.trabalho.transacao_serivce.database.entity.enums.TipoConta;
 import com.trabalho.transacao_serivce.database.entity.enums.TipoTransacao;
 import lombok.Builder;

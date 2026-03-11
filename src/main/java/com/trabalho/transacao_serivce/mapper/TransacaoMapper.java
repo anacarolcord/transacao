@@ -1,6 +1,6 @@
 package com.trabalho.transacao_serivce.mapper;
 
-import com.trabalho.transacao_serivce.database.entity.StatusTransacao;
+import com.trabalho.transacao_serivce.database.entity.enums.StatusTransacao;
 import com.trabalho.transacao_serivce.database.entity.Transacao;
 import com.trabalho.transacao_serivce.dto.request.TransacaoRequestDTO;
 import com.trabalho.transacao_serivce.dto.response.TransacaoResponseDTO;
