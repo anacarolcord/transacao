@@ -1,36 +1,54 @@
 package com.trabalho.transacao_serivce.utils;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.trabalho.transacao_serivce.database.entity.enums.TipoConta;
 import com.trabalho.transacao_serivce.exceptions.SaldoInsuficienteException;
+import com.trabalho.transacao_serivce.exceptions.SaldoNegativoException;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Objects;
 
+@RequiredArgsConstructor
 public class RedisUtils {
     public RedisTemplate<String,String> redisTemplate;
 
-    public BigDecimal decrement(Long idUsuario, BigDecimal valor){
-
-        HashOperations<String,String,String> hashOps = redisTemplate.opsForHash();
-
-        validaSaldo(idUsuario,valor);
+    public BigDecimal decrement(Long idUsuario, BigDecimal valor, TipoConta tipoConta){
+        String chave = "cliente: " + idUsuario;
+        validarSaldo(chave,valor, tipoConta);
 
         Long centavos = valor.movePointRight(2).longValue();
-        Long saldoPosTransacao = redisTemplate.opsForValue().decrement( String.valueOf(idUsuario),centavos);
-        BigDecimal saldoEmDecimal = BigDecimal.valueOf(saldoPosTransacao).movePointLeft(2);
+        Long saldoPosDecremento = redisTemplate.opsForHash()
+                .increment(chave,tipoConta,-centavos);
 
+        if(saldoPosDecremento < 0){
+            redisTemplate.opsForHash().increment(chave,tipoConta,centavos);
+            throw new SaldoInsuficienteException();
+        }
 
-
+        return new BigDecimal(saldoPosDecremento);
     }
 
-    public void validaSaldo(Long idUsuario, BigDecimal valor){
+    public void validarSaldo(String chave, BigDecimal valor, TipoConta tipoConta) {
 
-       String valorAtual = redisTemplate.opsForValue().get(String.valueOf(idUsuario));
+        Object valorNoRedis = redisTemplate.opsForHash().get(chave, tipoConta);
 
-       if(Objects.isNull(valorAtual)){
-           throw new SaldoInsuficienteException();
-       }
+        if(Objects.isNull(valorNoRedis)){
+            throw new SaldoInsuficienteException();
+        }
+
+        BigDecimal saldoAtualCentavos = new BigDecimal(valorNoRedis.toString());
+        BigDecimal valorTransacaoCentavos = valor.movePointRight(2);
+
+        if (saldoAtualCentavos.compareTo(valorTransacaoCentavos) < 0){
+            throw new SaldoInsuficienteException();
+        }
+
     }
 
 
