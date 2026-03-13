@@ -1,4 +1,4 @@
-package com.trabalho.transacao_serivce.database.oracle;
+package com.trabalho.transacao_serivce.database.oracle.model;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -7,7 +7,6 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
-import org.springframework.expression.EvaluationException;
 
 import java.math.BigDecimal;
 

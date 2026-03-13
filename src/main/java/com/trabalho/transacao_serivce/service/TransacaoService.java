@@ -1,6 +1,8 @@
 package com.trabalho.transacao_serivce.service;
 
 
+import com.trabalho.transacao_serivce.database.entity.enums.TipoConta;
+import com.trabalho.transacao_serivce.database.oracle.repository.ClienteSaldoRepository;
 import com.trabalho.transacao_serivce.dto.request.TransacaoRequestDTO;
 import com.trabalho.transacao_serivce.dto.response.TransacaoResponseDTO;
 import com.trabalho.transacao_serivce.utils.RedisUtils;
@@ -11,24 +13,33 @@ import java.math.BigDecimal;
 @Service
 public class TransacaoService {
     RedisUtils redisUtils;
+    ClienteSaldoRepository clienteSaldoRepository;
+
     //config do kafka
     //config do Redis
 
 
-    public TransacaoResponseDTO enviaTransacao(TransacaoRequestDTO request){
+    public TransacaoResponseDTO processaTransacao(TransacaoRequestDTO request){
 
-        redisUtils.decrement(request.getIdUsuario(), ,request.getValor());
+        Long idUsuario = request.getIdUsuario();
+        BigDecimal valor =request.getValor();
+        TipoConta tipoConta = request.getTipoConta();
+
+       BigDecimal valorAtualizado = redisUtils.decrement(idUsuario,valor,tipoConta);
+
+       atualizaSaldoNoBanco(valorAtualizado,idUsuario,tipoConta);
 
 
     }
 
-    public boolean saldoEhPositivo(Long idUsuario,BigDecimal valorTransacao){
 
-        BigDecimal valorAtual = redisUtils.decrement(idUsuario,valorTransacao);
-        if(valorAtual.compareTo(BigDecimal.ZERO) > 0){
-            return true;
+
+    public void atualizaSaldoNoBanco(BigDecimal saldoAtualizado, Long idUsuario, TipoConta tipoConta){
+        if(tipoConta.equals(TipoConta.CREDITO)){
+            clienteSaldoRepository.updateSaldoCredito(saldoAtualizado);
         }
-
-        return false;
+        if(tipoConta.equals(TipoConta.DEBITO)){
+            clienteSaldoRepository.updateSaldoDebito(saldoAtualizado);
+        }
     }
 }
