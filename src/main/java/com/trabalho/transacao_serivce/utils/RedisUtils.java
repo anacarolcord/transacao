@@ -29,7 +29,7 @@ public class RedisUtils {
     public TransacaoSaldoStatusDTO decrement(Long idUsuario, BigDecimal valor, TipoConta tipoContaEnum){
         TransacaoSaldoStatusDTO response = new TransacaoSaldoStatusDTO();
 
-        String chave = "cliente: " + idUsuario;
+        String chave = "cliente" + idUsuario;
         String tipoConta = tipoContaEnum.name();
 
         if(isValidTransacao(chave,valor, tipoConta)){
@@ -47,7 +47,6 @@ public class RedisUtils {
             response.setStatusTransacao(StatusTransacao.APROVADA);
             response.setSaldoAtualizado(new BigDecimal(saldoPosDecremento));
 
-
         }else{
             response.setStatusTransacao(StatusTransacao.REPROVADA);
         }
@@ -61,18 +60,28 @@ public class RedisUtils {
 
         if(Objects.isNull(valorNoRedis)){
             return false;
+        }else{
+            ObjectMapper objectMapper = new ObjectMapper();
+
+            BigDecimal valorCorreto = objectMapper.convertValue(valorNoRedis, BigDecimal.class);
+
+
+
+            BigDecimal saldoAtualCentavos = valorCorreto;
+            BigDecimal valorTransacaoCentavos = valor.movePointRight(2);
+
+            if (saldoAtualCentavos.compareTo(valorTransacaoCentavos) < 0){
+                return false;
+            }
+
+            return true;
+
         }
 
-        BigDecimal saldoAtualCentavos = new BigDecimal(valorNoRedis.toString());
-        BigDecimal valorTransacaoCentavos = valor.movePointRight(2);
-
-        if (saldoAtualCentavos.compareTo(valorTransacaoCentavos) < 0){
-            return false;
-        }
-
-        return true;
 
     }
+
+
 
 
 }

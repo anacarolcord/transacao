@@ -47,6 +47,7 @@ public class TransacaoService {
 
             clienteSaldoRepository.updateSaldoCredito(idUsuario,saldoAtualizado);
 
+
         }
         if(tipoConta.equals(TipoConta.DEBITO) && saldoAtualizado.compareTo(BigDecimal.ZERO) >= 0){
             clienteSaldoRepository.updateSaldoDebito(idUsuario, saldoAtualizado);

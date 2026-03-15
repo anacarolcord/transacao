@@ -31,8 +31,8 @@ public class ClientrModelController {
         Long saldoCredito = entity.getSaldoCredito().longValue();
         Long saldoDebito = entity.getSaldoDebito().longValue();
 
-        redisTemplate.opsForHash().put(chave,CREDITO.name(),saldoCredito);
-        redisTemplate.opsForHash().put(chave,DEBITO.name(),saldoDebito);
+        redisTemplate.opsForHash().put(chave,CREDITO.name(),String.valueOf(saldoCredito));
+        redisTemplate.opsForHash().put(chave,DEBITO.name(),String.valueOf(saldoDebito));
     }
 
 }
