@@ -3,7 +3,7 @@ spring:
     name: transacao-serivce
 
   datasource:
-    url: jdbc:oracle:thin:@localhost:1521:FREE
+    url: jdbc:oracle:thin:@//localhost:1521/FREEPDB1
     username: guest
     password: guest
     driver-class-name: oracle.jdbc.OracleDriver

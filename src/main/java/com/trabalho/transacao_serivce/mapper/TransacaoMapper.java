@@ -4,30 +4,25 @@ import com.trabalho.transacao_serivce.database.entity.enums.StatusTransacao;
 import com.trabalho.transacao_serivce.database.entity.Transacao;
 import com.trabalho.transacao_serivce.dto.request.TransacaoRequestDTO;
 import com.trabalho.transacao_serivce.dto.response.TransacaoResponseDTO;
+import com.trabalho.transacao_serivce.dto.response.TransacaoSaldoStatusDTO;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 public final class TransacaoMapper {
 
-    public static Transacao toTransacao(TransacaoRequestDTO request){
-        return Transacao.builder()
-                .tipoTransacao(request.getTipoTransacao())
-                .valor(request.getValor())
-                .idUsuario(request.getIdUsuario())
-                .tipoConta(request.getTipoConta())
-                .dataCriacao(LocalDateTime.now())
-                .statusTransacao(StatusTransacao.PROCESSANDO).build();
-    }
 
-    public static TransacaoResponseDTO toResponse(Transacao transacao){
-        return TransacaoResponseDTO.builder()
-                .idTransacao(transacao.getIdTransacao())
-                .idUsuario(transacao.getIdUsuario())
-                .valor(transacao.getValor())
-                .tipoTransacao(transacao.getTipoTransacao())
-                .tipoConta(transacao.getTipoConta())
-                .dataCriacao(transacao.getDataCriacao())
-                .statusTransacao(transacao.getStatusTransacao())
-                .build();
+    public static TransacaoResponseDTO toResponse(TransacaoRequestDTO request, TransacaoSaldoStatusDTO info){
+        TransacaoResponseDTO response = new TransacaoResponseDTO();
+
+        response.setDataCriacao(LocalDateTime.now());
+        response.setIdTransacao(UUID.randomUUID());
+        response.setIdUsuario(request.getIdUsuario());
+        response.setTipoConta(request.getTipoConta());
+        response.setTipoTransacao(request.getTipoTransacao());
+        response.setStatusTransacao(info.getStatusTransacao());
+        response.setSaldoAtualizado(info.getSaldoAtualizado());
+
+        return response;
     }
 }
