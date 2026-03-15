@@ -1,9 +1,6 @@
 package com.trabalho.transacao_serivce.database.oracle.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -19,7 +16,9 @@ public class ClienteSaldoModel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idUsuario;
+    @Column(name = "SALDO_CREDITO")
     private BigDecimal saldoCredito;
+    @Column(name = "SALDO_DEBITO")
     private BigDecimal saldoDebito;
 
 }

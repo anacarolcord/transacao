@@ -1,6 +1,7 @@
 package com.trabalho.transacao_serivce.dto.request;
 
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.trabalho.transacao_serivce.database.entity.enums.TipoConta;
 import com.trabalho.transacao_serivce.database.entity.enums.TipoTransacao;
 import lombok.Builder;

@@ -11,20 +11,18 @@ import org.springframework.stereotype.Repository;
 import java.math.BigDecimal;
 
 @Repository
-public interface ClienteSaldoRepository extends JpaRepository<Long,ClienteSaldoModel> {
-
-    public ClienteSaldoModel save(ClienteSaldoModel cliente);
+public interface ClienteSaldoRepository extends JpaRepository<ClienteSaldoModel,Long> {
 
     @Modifying
     @Transactional
     @Query("UPDATE ClienteSaldoModel c SET c.saldoCredito = :valorAtualizado WHERE c.idUsuario = :idUsuario")
-    public ClienteSaldoModel updateSaldoCredito(@Param("idUsuario")Long idUsuario,
+    void updateSaldoCredito(@Param("idUsuario")Long idUsuario,
                                                 @Param("valorAtualizado")BigDecimal valorAtualizado);
 
     @Modifying
     @Transactional
     @Query("UPDATE ClienteSaldoModel c SET c.saldoDebito = :valorAtualizado WHERE c.idUsuario = :idUsuario")
-    public ClienteSaldoModel updateSaldoDebito(@Param("idUsuario")Long idUsuario,
+    void updateSaldoDebito(@Param("idUsuario")Long idUsuario,
                                                @Param("valorAtualizado")BigDecimal valorAtualizado);
 
 }

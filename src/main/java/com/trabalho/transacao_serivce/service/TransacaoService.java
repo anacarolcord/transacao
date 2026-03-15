@@ -1,25 +1,24 @@
 package com.trabalho.transacao_serivce.service;
 
-
-import com.trabalho.transacao_serivce.database.entity.enums.StatusTransacao;
 import com.trabalho.transacao_serivce.database.entity.enums.TipoConta;
 import com.trabalho.transacao_serivce.database.oracle.repository.ClienteSaldoRepository;
 import com.trabalho.transacao_serivce.dto.request.TransacaoRequestDTO;
 import com.trabalho.transacao_serivce.dto.response.TransacaoResponseDTO;
 import com.trabalho.transacao_serivce.dto.response.TransacaoSaldoStatusDTO;
 import com.trabalho.transacao_serivce.utils.RedisUtils;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.UUID;
+
 
 import static com.trabalho.transacao_serivce.mapper.TransacaoMapper.toResponse;
 
 @Service
+@RequiredArgsConstructor
 public class TransacaoService {
-    RedisUtils redisUtils;
-    ClienteSaldoRepository clienteSaldoRepository;
+    private final RedisUtils redisUtils;
+    private final ClienteSaldoRepository clienteSaldoRepository;
 
     //config do kafka
 
