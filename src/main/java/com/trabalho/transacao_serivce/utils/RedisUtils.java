@@ -3,21 +3,12 @@ package com.trabalho.transacao_serivce.utils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.trabalho.transacao_serivce.database.entity.enums.StatusTransacao;
 import com.trabalho.transacao_serivce.database.entity.enums.TipoConta;
-import com.trabalho.transacao_serivce.dto.response.TransacaoResponseDTO;
 import com.trabalho.transacao_serivce.dto.response.TransacaoSaldoStatusDTO;
-import com.trabalho.transacao_serivce.exceptions.SaldoInsuficienteException;
-import com.trabalho.transacao_serivce.exceptions.SaldoNegativoException;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
-import org.springframework.context.annotation.Bean;
-import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Component
