@@ -25,6 +25,7 @@ import java.util.Objects;
 public class RedisUtils {
 
     public final RedisTemplate<String,String> redisTemplate;
+    private final ObjectMapper objectMapper;
 
     public TransacaoSaldoStatusDTO decrement(Long idUsuario, BigDecimal valor, TipoConta tipoContaEnum){
         TransacaoSaldoStatusDTO response = new TransacaoSaldoStatusDTO();
@@ -38,14 +39,18 @@ public class RedisUtils {
             Long saldoPosDecremento = redisTemplate.opsForHash()
                     .increment(chave,tipoConta,-centavos);
 
-            if(saldoPosDecremento < 0){
+            BigDecimal saldoEmReaisAtualizado = BigDecimal.valueOf(saldoPosDecremento).movePointLeft(2);
+
+
+
+            if(saldoEmReaisAtualizado.compareTo(BigDecimal.ZERO) < 0){
                 redisTemplate.opsForHash().increment(chave,tipoConta,centavos);
                 response.setStatusTransacao(StatusTransacao.REPROVADA);
                // throw new SaldoInsuficienteException();
             }
 
             response.setStatusTransacao(StatusTransacao.APROVADA);
-            response.setSaldoAtualizado(new BigDecimal(saldoPosDecremento));
+            response.setSaldoAtualizado(saldoEmReaisAtualizado);
 
         }else{
             response.setStatusTransacao(StatusTransacao.REPROVADA);
@@ -56,21 +61,20 @@ public class RedisUtils {
 
     public boolean isValidTransacao(String chave, BigDecimal valor, String tipoConta) {
 
+        //TODO verificar convertendo pra centavos tambem!!
         Object valorNoRedis = redisTemplate.opsForHash().get(chave, tipoConta);
 
         if(Objects.isNull(valorNoRedis)){
             return false;
         }else{
-            ObjectMapper objectMapper = new ObjectMapper();
 
             BigDecimal valorCorreto = objectMapper.convertValue(valorNoRedis, BigDecimal.class);
 
 
 
-            BigDecimal saldoAtualCentavos = valorCorreto;
-            BigDecimal valorTransacaoCentavos = valor.movePointRight(2);
+            BigDecimal valorTransacaoCentavos = valor;
 
-            if (saldoAtualCentavos.compareTo(valorTransacaoCentavos) < 0){
+            if (valorCorreto.compareTo(valorTransacaoCentavos) < 0){
                 return false;
             }
 

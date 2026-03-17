@@ -28,9 +28,11 @@ public class ClientrModelController {
         ClienteSaldoModel entity = repository.save(request);
         String chave = "cliente" + entity.getIdUsuario();
 
-        Long saldoCredito = entity.getSaldoCredito().longValue();
-        Long saldoDebito = entity.getSaldoDebito().longValue();
+        Long saldoCredito = entity.getSaldoCredito().movePointRight(2).longValue();
+        Long saldoDebito = entity.getSaldoDebito().movePointRight(2).longValue();
 
+
+        //TODO seria melhor pegar a info do banco e jogar no redis
         redisTemplate.opsForHash().put(chave,CREDITO.name(),String.valueOf(saldoCredito));
         redisTemplate.opsForHash().put(chave,DEBITO.name(),String.valueOf(saldoDebito));
     }
