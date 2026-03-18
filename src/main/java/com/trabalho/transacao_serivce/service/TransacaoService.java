@@ -5,6 +5,7 @@ import com.trabalho.transacao_serivce.database.oracle.repository.ClienteSaldoRep
 import com.trabalho.transacao_serivce.dto.request.TransacaoRequestDTO;
 import com.trabalho.transacao_serivce.dto.response.TransacaoResponseDTO;
 import com.trabalho.transacao_serivce.dto.response.TransacaoSaldoStatusDTO;
+import com.trabalho.transacao_serivce.messaging.config.kafka.TransacaoProducer;
 import com.trabalho.transacao_serivce.utils.RedisUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,7 @@ import static com.trabalho.transacao_serivce.mapper.TransacaoMapper.toResponse;
 public class TransacaoService {
     private final RedisUtils redisUtils;
     private final ClienteSaldoRepository clienteSaldoRepository;
+    private final TransacaoProducer transacaoProducer;
 
     //config do kafka
 
@@ -33,7 +35,7 @@ public class TransacaoService {
 
        atualizaSaldoNoBanco(responseComStatus,idUsuario,tipoConta);
 
-       //topico do kafka
+       transacaoProducer.enviarTransacao(toResponse(request,responseComStatus));
 
        return toResponse(request,responseComStatus);
     }
