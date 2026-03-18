@@ -31,7 +31,12 @@ spring:
           configuration:
             auto.offset.reset: earliest
 
+app:
+  kafka:
+    routing:
+      APROVADA: "aprovadas-topic"
+      REPROVADA: "reprovadas-topic"
+
       bindings:
         enviarTransacao-out-0:
-          destination: transacoes-topic
           content-type: application/json

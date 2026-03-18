@@ -35,16 +35,18 @@ public class RedisUtils {
 
 
             if(saldoEmReaisAtualizado.compareTo(BigDecimal.ZERO) < 0){
-                redisTemplate.opsForHash().increment(chave,tipoConta,centavos);
+                Long saldoAtual = redisTemplate.opsForHash().increment(chave,tipoConta,centavos);
                 response.setStatusTransacao(StatusTransacao.REPROVADA);
-               // throw new SaldoInsuficienteException();
+                response.setSaldoAtualizado(BigDecimal.valueOf(saldoAtual).movePointLeft(2));
+
+            }else{
+                response.setStatusTransacao(StatusTransacao.APROVADA);
+                response.setSaldoAtualizado(saldoEmReaisAtualizado);
             }
 
-            response.setStatusTransacao(StatusTransacao.APROVADA);
-            response.setSaldoAtualizado(saldoEmReaisAtualizado);
-
         }else{
-            response.setStatusTransacao(StatusTransacao.REPROVADA);
+            throw new RuntimeException();
+
         }
 
         return response;
