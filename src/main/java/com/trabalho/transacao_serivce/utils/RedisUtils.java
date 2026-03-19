@@ -32,8 +32,6 @@ public class RedisUtils {
 
             BigDecimal saldoEmReaisAtualizado = BigDecimal.valueOf(saldoPosDecremento).movePointLeft(2);
 
-
-
             if(saldoEmReaisAtualizado.compareTo(BigDecimal.ZERO) < 0){
                 Long saldoAtual = redisTemplate.opsForHash().increment(chave,tipoConta,centavos);
                 response.setStatusTransacao(StatusTransacao.REPROVADA);
@@ -46,28 +44,27 @@ public class RedisUtils {
 
         }else{
             throw new RuntimeException();
-
         }
-
         return response;
     }
 
     public boolean isValidTransacao(String chave, BigDecimal valor, String tipoConta) {
 
-        //TODO verificar convertendo pra centavos tambem!!
+        if(valor.compareTo(BigDecimal.ZERO) == 0){
+            return false;
+        }
+
         Object valorNoRedis = redisTemplate.opsForHash().get(chave, tipoConta);
+        Long valorRedisConvertido= objectMapper.convertValue(valorNoRedis, Long.class);
 
         if(Objects.isNull(valorNoRedis)){
             return false;
         }else{
 
-            BigDecimal valorCorreto = objectMapper.convertValue(valorNoRedis, BigDecimal.class);
+            Long valorTransacaoCentavos = valor.movePointRight(2).longValue();
 
 
-
-            BigDecimal valorTransacaoCentavos = valor;
-
-            if (valorCorreto.compareTo(valorTransacaoCentavos) < 0){
+            if (valorRedisConvertido.compareTo(valorTransacaoCentavos) < 0){
                 return false;
             }
 
