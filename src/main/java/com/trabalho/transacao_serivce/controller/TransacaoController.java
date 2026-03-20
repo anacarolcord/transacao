@@ -3,6 +3,7 @@ package com.trabalho.transacao_serivce.controller;
 import com.trabalho.transacao_serivce.dto.request.TransacaoRequestDTO;
 import com.trabalho.transacao_serivce.dto.response.TransacaoResponseDTO;
 import com.trabalho.transacao_serivce.service.TransacaoService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,7 +19,7 @@ public class TransacaoController {
     private final TransacaoService transacaoService;
 
     @PostMapping
-    public ResponseEntity<TransacaoResponseDTO> saveTransacao(@RequestBody TransacaoRequestDTO request){
+    public ResponseEntity<TransacaoResponseDTO> saveTransacao(@RequestBody @Valid TransacaoRequestDTO request){
 
         TransacaoResponseDTO response = transacaoService.processaTransacao(request);
 

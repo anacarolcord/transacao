@@ -31,13 +31,13 @@ public class TransacaoService {
         BigDecimal valor =request.getValor();
         TipoConta tipoConta = request.getTipoConta();
 
-       TransacaoSaldoStatusDTO responseComStatus = redisUtils.decrement(idUsuario,valor,tipoConta);
+        TransacaoSaldoStatusDTO responseComStatus = redisUtils.decrement(idUsuario,valor,tipoConta);
 
-       atualizaSaldoNoBanco(responseComStatus,idUsuario,tipoConta);
+        atualizaSaldoNoBanco(responseComStatus,idUsuario,tipoConta);
 
-       transacaoProducer.enviarTransacao(toResponse(request,responseComStatus));
+        transacaoProducer.enviarTransacao(toResponse(request,responseComStatus));
 
-       return toResponse(request,responseComStatus);
+        return toResponse(request,responseComStatus);
     }
 
 

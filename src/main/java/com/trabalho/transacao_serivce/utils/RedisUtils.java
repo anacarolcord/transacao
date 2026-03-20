@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.trabalho.transacao_serivce.database.entity.enums.StatusTransacao;
 import com.trabalho.transacao_serivce.database.entity.enums.TipoConta;
 import com.trabalho.transacao_serivce.dto.response.TransacaoSaldoStatusDTO;
+import com.trabalho.transacao_serivce.exceptions.TransacaoInvalidaException;
+import com.trabalho.transacao_serivce.exceptions.ValorInvalidoException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
@@ -43,15 +45,16 @@ public class RedisUtils {
             }
 
         }else{
-            throw new RuntimeException();
+            throw new TransacaoInvalidaException();
         }
         return response;
     }
 
-    public boolean isValidTransacao(String chave, BigDecimal valor, String tipoConta) {
+    public boolean isValidTransacao(String chave, BigDecimal valor, String tipoConta){
 
-        if(valor.compareTo(BigDecimal.ZERO) == 0){
-            return false;
+
+        if(valor.compareTo(BigDecimal.ZERO) == 0 || valor.compareTo(BigDecimal.ZERO) < 0){
+            throw new ValorInvalidoException();
         }
 
         Object valorNoRedis = redisTemplate.opsForHash().get(chave, tipoConta);

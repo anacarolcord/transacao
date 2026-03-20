@@ -30,6 +30,10 @@ spring:
           auto-create-topics: true
           configuration:
             auto.offset.reset: earliest
+            replicationFactor: 3
+            acks: all
+            enable.idempotence: true
+
 
 app:
   kafka:
