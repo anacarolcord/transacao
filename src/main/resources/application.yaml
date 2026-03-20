@@ -24,6 +24,7 @@ spring:
 
   cloud:
     stream:
+      default-binder: kafka
       kafka:
         binder:
           brokers: localhost:9092

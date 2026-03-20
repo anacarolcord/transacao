@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.trabalho.transacao_serivce.dto.response.TransacaoResponseDTO;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 
@@ -16,12 +17,14 @@ public class TransacaoProducer {
 //    @Value("${spring.cloud.stream.bindings.enviarTransacao-out-0.destination}")
 //    public String topico;
     public final KafkaTopicConfig kafkaTopicConfig;
-    public final KafkaTemplate<String,String> kafkaTemplate;
+//    public final KafkaTemplate<String,String> kafkaTemplate;
+    public final StreamBridge streamBridge;
     public final ObjectMapper objectMapper;
 
-    public TransacaoProducer(KafkaTopicConfig kafkaTopicConfig, KafkaTemplate<String, String> kafkaTemplate, ObjectMapper objectMapper) {
+    public TransacaoProducer(KafkaTopicConfig kafkaTopicConfig, KafkaTemplate<String, String> kafkaTemplate, StreamBridge streamBridge, ObjectMapper objectMapper) {
         this.kafkaTopicConfig = kafkaTopicConfig;
-        this.kafkaTemplate = kafkaTemplate;
+        this.streamBridge = streamBridge;
+//        this.kafkaTemplate = kafkaTemplate;
         this.objectMapper = objectMapper;
     }
 
@@ -41,6 +44,6 @@ public class TransacaoProducer {
             throw  new RuntimeException(e);
         }
 
-        this.kafkaTemplate.send(destino,corpo);
+        this.streamBridge.send(destino,corpo);
     }
 }
