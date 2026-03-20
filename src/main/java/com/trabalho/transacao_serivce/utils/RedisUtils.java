@@ -26,7 +26,7 @@ public class RedisUtils {
         String chave = "cliente" + idUsuario;
         String tipoConta = tipoContaEnum.name();
 
-        if(isValidTransacao(chave,valor, tipoConta)){
+        if(isValidTransacao(chave,valor, tipoConta, response)){
 
             Long centavos = valor.movePointRight(2).longValue();
             Long saldoPosDecremento = redisTemplate.opsForHash()
@@ -50,35 +50,22 @@ public class RedisUtils {
         return response;
     }
 
-    public boolean isValidTransacao(String chave, BigDecimal valor, String tipoConta){
-
+    public boolean isValidTransacao(String chave, BigDecimal valor, String tipoConta, TransacaoSaldoStatusDTO response){
 
         if(valor.compareTo(BigDecimal.ZERO) == 0 || valor.compareTo(BigDecimal.ZERO) < 0){
             throw new ValorInvalidoException();
         }
 
         Object valorNoRedis = redisTemplate.opsForHash().get(chave, tipoConta);
-        Long valorRedisConvertido= objectMapper.convertValue(valorNoRedis, Long.class);
 
         if(Objects.isNull(valorNoRedis)){
             return false;
-        }else{
-
-            Long valorTransacaoCentavos = valor.movePointRight(2).longValue();
-
-
-            if (valorRedisConvertido.compareTo(valorTransacaoCentavos) < 0){
-                return false;
-            }
-
-            return true;
-
         }
-
-
+            return true;
+        }
     }
 
 
 
 
-}
+

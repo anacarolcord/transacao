@@ -19,6 +19,7 @@ import java.util.UUID;
 public class TransacaoResponseDTO {
     private UUID idTransacao;
     private Long idUsuario;
+    private BigDecimal valorTransacao;
     private BigDecimal saldoAtualizado;
     private LocalDateTime dataCriacao;
     private TipoTransacao tipoTransacao;

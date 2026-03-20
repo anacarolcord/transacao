@@ -21,6 +21,7 @@ public final class TransacaoMapper {
         response.setTipoConta(request.getTipoConta());
         response.setTipoTransacao(request.getTipoTransacao());
         response.setStatusTransacao(info.getStatusTransacao());
+        response.setValorTransacao(request.getValor());
         response.setSaldoAtualizado(info.getSaldoAtualizado());
 
         return response;
