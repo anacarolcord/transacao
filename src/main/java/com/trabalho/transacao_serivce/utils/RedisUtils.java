@@ -18,7 +18,6 @@ import java.util.Objects;
 public class RedisUtils {
 
     public final RedisTemplate<String,String> redisTemplate;
-    private final ObjectMapper objectMapper;
 
     public TransacaoSaldoStatusDTO decrement(Long idUsuario, BigDecimal valor, TipoConta tipoContaEnum){
         TransacaoSaldoStatusDTO response = new TransacaoSaldoStatusDTO();
