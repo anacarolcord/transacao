@@ -1,5 +1,7 @@
 package com.trabalho.transacao_serivce.dto;
 
+import com.trabalho.transacao_serivce.database.entity.enums.StatusTransacao;
+import jdk.jshell.Snippet;
 import lombok.Getter;
 import lombok.Setter;
 

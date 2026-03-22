@@ -37,7 +37,7 @@ public class CacheService {
     public TransacaoSaldoStatusDTO processarTransacao(Long idUsuario, BigDecimal valor, TipoConta tipoContaEnum){
         String chave = String.valueOf(idUsuario);
 
-         Optional<ClienteDTO> clienteDTO = consultaClienteRedis(idUsuario,chave, tipoContaEnum.name(), valor);
+         Optional<ClienteDTO> clienteDTO = consultaClienteRedis(idUsuario,chave, tipoContaEnum.name());
 
         if (clienteDTO.isEmpty()) {
             throw new ClienteNaoEncontradoException();
@@ -92,18 +92,15 @@ public class CacheService {
 
 
     @Transactional
-    public Optional<ClienteDTO> consultaClienteRedis(Long idUsuario,String chave, String tipoConta, BigDecimal valor) {
+    public Optional<ClienteDTO> consultaClienteRedis(Long idUsuario,String chave, String tipoConta ) {
 
         Object valorNoRedis = redisTemplate.opsForHash().get(chave, tipoConta);
-
-        if(Objects.equals(valorNoRedis,"0")){
-            throw new SaldoInsuficienteException();
-        }
+        
 
         if (Objects.nonNull(valorNoRedis)  ) {
             String dadoRedis = String.valueOf(valorNoRedis);
             ClienteDTO clienteDTO = new ClienteDTO();
-            BigDecimal valorSaldo = objectMapper.convertValue(dadoRedis, BigDecimal.class);
+            BigDecimal valorSaldo = new BigDecimal(dadoRedis);
 
             if(tipoConta.equals(CREDITO.name())){
                 clienteDTO.setSaldoCredito(valorSaldo);
@@ -116,11 +113,9 @@ public class CacheService {
 
         ClienteDTO clienteDoBanco = buscaDadosNoBanco(idUsuario);
 
-        if (Objects.isNull(valorNoRedis)) {
-            populaDadosNoRedis(clienteDoBanco, chave);
-        }
+        populaDadosNoRedis(clienteDoBanco, chave);
 
-        return Optional.ofNullable(clienteDoBanco);
+        return Optional.of(clienteDoBanco);
     }
 
         public void populaDadosNoRedis(ClienteDTO cliente, String chave) {
