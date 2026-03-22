@@ -31,7 +31,7 @@ public class TransacaoService {
         BigDecimal valor =request.getValor();
         TipoConta tipoConta = request.getTipoConta();
 
-        TransacaoSaldoStatusDTO responseComStatus = redisUtils.decrement(idUsuario,valor,tipoConta);
+        TransacaoSaldoStatusDTO responseComStatus = redisUtils.processarTransacao(idUsuario,valor,tipoConta);
 
         atualizaSaldoNoBanco(responseComStatus,idUsuario,tipoConta);
 

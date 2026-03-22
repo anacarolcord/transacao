@@ -7,12 +7,15 @@ import com.trabalho.transacao_serivce.database.oracle.model.ClienteSaldoModel;
 import com.trabalho.transacao_serivce.database.oracle.repository.ClienteSaldoRepository;
 import com.trabalho.transacao_serivce.dto.ClienteDTO;
 import com.trabalho.transacao_serivce.dto.response.TransacaoSaldoStatusDTO;
+import com.trabalho.transacao_serivce.exceptions.ClienteNaoEncontradoException;
 import com.trabalho.transacao_serivce.exceptions.ErroProcessarTransacaoExcepetion;
 import com.trabalho.transacao_serivce.exceptions.TransacaoInvalidaException;
 import com.trabalho.transacao_serivce.exceptions.ValorInvalidoException;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.propertyeditors.CurrencyEditor;
+import org.springframework.data.redis.connection.stream.StreamInfo;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
@@ -31,10 +34,24 @@ public class RedisUtils {
     private final RedisTemplate<String,String> redisTemplate;
     private final ClienteSaldoRepository clienteSaldoRepository;
 
-    public TransacaoSaldoStatusDTO decrement(Long idUsuario, BigDecimal valor, TipoConta tipoContaEnum){
+
+    public TransacaoSaldoStatusDTO processarTransacao(Long idUsuario, BigDecimal valor, TipoConta tipoContaEnum){
+        String chave = String.valueOf(idUsuario);
+
+         Optional<ClienteDTO> clienteDTO = consultaClienteRedis(idUsuario,chave, tipoContaEnum.name(), valor);
+
+        if (clienteDTO.isEmpty()) {
+            throw new ClienteNaoEncontradoException();
+        }
+
+        ClienteDTO cliente = clienteDTO.get();
+
+        return decrement(chave,cliente.getIdUsuario(),valor,tipoContaEnum);
+    }
+
+    public TransacaoSaldoStatusDTO decrement(String chave, Long idUsuario, BigDecimal valor, TipoConta tipoContaEnum){
         TransacaoSaldoStatusDTO response = new TransacaoSaldoStatusDTO();
 
-        String chave = "cliente" + idUsuario;
         String tipoConta = tipoContaEnum.name();
 
         if(isValidTransacao(chave,valor, tipoConta, response)){
@@ -72,30 +89,28 @@ public class RedisUtils {
 
     }
 
+
+    @Transactional
     public Optional<ClienteDTO> consultaClienteRedis(Long idUsuario,String chave, String tipoConta, BigDecimal valor) {
 
         Object valorNoRedis = redisTemplate.opsForHash().get(chave, tipoConta);
-        ClienteDTO cliente = null;
 
-        if (Objects.isNull(valorNoRedis)) {
-
-            try {
-                 cliente = buscaDadosNoBanco(idUsuario);
-
-            } catch (RuntimeException e) {
-                throw new EntityNotFoundException(e);
-            }
-
+        if (Objects.nonNull(valorNoRedis)) {
+            return Optional.of((ClienteDTO) valorNoRedis);
         }
 
-        return Optional.ofNullable(cliente);
+        ClienteDTO clienteDoBanco = buscaDadosNoBanco(idUsuario);
+
+        if (Objects.nonNull(clienteDoBanco)) {
+            populaDadosNoRedis(clienteDoBanco, chave);
+        }
+
+        return Optional.ofNullable(clienteDoBanco);
     }
 
-        public void populaDadosNoRedis(ClienteSaldoModel cliente) {
-            String chave = String.valueOf(cliente.getIdUsuario());
+        public void populaDadosNoRedis(ClienteDTO cliente, String chave) {
             redisTemplate.opsForHash().put(chave,DEBITO.name(),cliente.getSaldoDebito());
             redisTemplate.opsForHash().put(chave,CREDITO.name(), cliente.getSaldoCredito());
-
         }
 
 
@@ -106,7 +121,10 @@ public class RedisUtils {
 
             return toClienteDTO(clienteSaldoModel);
         }
+
     }
+
+
 
 
 
