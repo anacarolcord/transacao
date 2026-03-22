@@ -23,4 +23,11 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleValorInvalido(ValorInvalidoException e){
         return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(e.getMessage());
     }
+
+    @ExceptionHandler(SaldoInsuficienteException.class)
+    public ResponseEntity<String> handleSaldoInsuficiente(SaldoInsuficienteException e){
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(e.getMessage());
+    }
+
+
 }

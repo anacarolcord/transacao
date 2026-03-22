@@ -7,10 +7,7 @@ import com.trabalho.transacao_serivce.database.oracle.model.ClienteSaldoModel;
 import com.trabalho.transacao_serivce.database.oracle.repository.ClienteSaldoRepository;
 import com.trabalho.transacao_serivce.dto.ClienteDTO;
 import com.trabalho.transacao_serivce.dto.response.TransacaoSaldoStatusDTO;
-import com.trabalho.transacao_serivce.exceptions.ClienteNaoEncontradoException;
-import com.trabalho.transacao_serivce.exceptions.ErroProcessarTransacaoExcepetion;
-import com.trabalho.transacao_serivce.exceptions.TransacaoInvalidaException;
-import com.trabalho.transacao_serivce.exceptions.ValorInvalidoException;
+import com.trabalho.transacao_serivce.exceptions.*;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +29,7 @@ import static com.trabalho.transacao_serivce.mapper.TransacaoMapper.toClienteDTO
 public class RedisUtils {
 
     private final RedisTemplate<String,String> redisTemplate;
+    private final ObjectMapper objectMapper;
     private final ClienteSaldoRepository clienteSaldoRepository;
 
 
@@ -95,13 +93,19 @@ public class RedisUtils {
 
         Object valorNoRedis = redisTemplate.opsForHash().get(chave, tipoConta);
 
-        if (Objects.nonNull(valorNoRedis)) {
-            return Optional.of((ClienteDTO) valorNoRedis);
+        if(Objects.equals(valorNoRedis,"0")){
+            throw new SaldoInsuficienteException();
+        }
+
+        if (Objects.nonNull(valorNoRedis)  ) {
+            String dadoRedis = String.valueOf(valorNoRedis);
+            ClienteDTO clienteDTO = objectMapper.convertValue(dadoRedis,ClienteDTO.class);
+            return Optional.of(clienteDTO);
         }
 
         ClienteDTO clienteDoBanco = buscaDadosNoBanco(idUsuario);
 
-        if (Objects.nonNull(clienteDoBanco)) {
+        if (Objects.isNull(valorNoRedis)) {
             populaDadosNoRedis(clienteDoBanco, chave);
         }
 
@@ -109,8 +113,12 @@ public class RedisUtils {
     }
 
         public void populaDadosNoRedis(ClienteDTO cliente, String chave) {
-            redisTemplate.opsForHash().put(chave,DEBITO.name(),cliente.getSaldoDebito());
-            redisTemplate.opsForHash().put(chave,CREDITO.name(), cliente.getSaldoCredito());
+
+            Long credito = cliente.getSaldoCredito().movePointRight(2).longValue();
+            Long debito = cliente.getSaldoDebito().movePointRight(2).longValue();
+
+            redisTemplate.opsForHash().put(chave,DEBITO.name(),String.valueOf(debito));
+            redisTemplate.opsForHash().put(chave,CREDITO.name(), String.valueOf(credito));
         }
 
 
