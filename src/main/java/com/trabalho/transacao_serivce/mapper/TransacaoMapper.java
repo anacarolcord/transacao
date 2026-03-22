@@ -2,6 +2,8 @@ package com.trabalho.transacao_serivce.mapper;
 
 import com.trabalho.transacao_serivce.database.entity.enums.StatusTransacao;
 import com.trabalho.transacao_serivce.database.entity.Transacao;
+import com.trabalho.transacao_serivce.database.oracle.model.ClienteSaldoModel;
+import com.trabalho.transacao_serivce.dto.ClienteDTO;
 import com.trabalho.transacao_serivce.dto.request.TransacaoRequestDTO;
 import com.trabalho.transacao_serivce.dto.response.TransacaoResponseDTO;
 import com.trabalho.transacao_serivce.dto.response.TransacaoSaldoStatusDTO;
@@ -25,5 +27,17 @@ public final class TransacaoMapper {
         response.setSaldoAtualizado(info.getSaldoAtualizado());
 
         return response;
+    }
+
+    public static ClienteDTO toClienteDTO(ClienteSaldoModel entity){
+
+        ClienteDTO clienteDTO = new ClienteDTO();
+
+        clienteDTO.setIdUsuario(entity.getIdUsuario());
+        clienteDTO.setSaldoCredito(entity.getSaldoCredito());
+        clienteDTO.setSaldoDebito(entity.getSaldoDebito());
+
+        return clienteDTO;
+
     }
 }

@@ -16,13 +16,13 @@ public interface ClienteSaldoRepository extends JpaRepository<ClienteSaldoModel,
     @Modifying
     @Transactional
     @Query("UPDATE ClienteSaldoModel c SET c.saldoCredito = :valorAtualizado WHERE c.idUsuario = :idUsuario")
-    void updateSaldoCredito(@Param("idUsuario")Long idUsuario,
+    ClienteSaldoModel updateSaldoCredito(@Param("idUsuario")Long idUsuario,
                                                 @Param("valorAtualizado")BigDecimal valorAtualizado);
 
     @Modifying
     @Transactional
     @Query("UPDATE ClienteSaldoModel c SET c.saldoDebito = :valorAtualizado WHERE c.idUsuario = :idUsuario")
-    void updateSaldoDebito(@Param("idUsuario")Long idUsuario,
+    ClienteSaldoModel updateSaldoDebito(@Param("idUsuario")Long idUsuario,
                                                @Param("valorAtualizado")BigDecimal valorAtualizado);
 
 }
