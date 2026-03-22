@@ -6,7 +6,6 @@ import com.trabalho.transacao_serivce.dto.request.TransacaoRequestDTO;
 import com.trabalho.transacao_serivce.dto.response.TransacaoResponseDTO;
 import com.trabalho.transacao_serivce.dto.response.TransacaoSaldoStatusDTO;
 import com.trabalho.transacao_serivce.messaging.config.kafka.TransacaoProducer;
-import com.trabalho.transacao_serivce.utils.RedisUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -18,7 +17,7 @@ import static com.trabalho.transacao_serivce.mapper.TransacaoMapper.toResponse;
 @Service
 @RequiredArgsConstructor
 public class TransacaoService {
-    private final RedisUtils redisUtils;
+    private final CacheService cacheService;
     private final ClienteSaldoRepository clienteSaldoRepository;
     private final TransacaoProducer transacaoProducer;
 
@@ -31,7 +30,7 @@ public class TransacaoService {
         BigDecimal valor =request.getValor();
         TipoConta tipoConta = request.getTipoConta();
 
-        TransacaoSaldoStatusDTO responseComStatus = redisUtils.processarTransacao(idUsuario,valor,tipoConta);
+        TransacaoSaldoStatusDTO responseComStatus = cacheService.processarTransacao(idUsuario,valor,tipoConta);
 
         atualizaSaldoNoBanco(responseComStatus,idUsuario,tipoConta);
 

@@ -1,4 +1,4 @@
-package com.trabalho.transacao_serivce.utils;
+package com.trabalho.transacao_serivce.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.trabalho.transacao_serivce.database.entity.enums.StatusTransacao;
@@ -8,15 +8,14 @@ import com.trabalho.transacao_serivce.database.oracle.repository.ClienteSaldoRep
 import com.trabalho.transacao_serivce.dto.ClienteDTO;
 import com.trabalho.transacao_serivce.dto.response.TransacaoSaldoStatusDTO;
 import com.trabalho.transacao_serivce.exceptions.*;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.propertyeditors.CurrencyEditor;
-import org.springframework.data.redis.connection.stream.StreamInfo;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.time.Duration;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -26,8 +25,10 @@ import static com.trabalho.transacao_serivce.mapper.TransacaoMapper.toClienteDTO
 
 @Component
 @RequiredArgsConstructor
-public class RedisUtils {
+public class CacheService {
 
+    @Value("${app.cache.transacao-ttl}")
+    private Duration ttlCache;
     private final RedisTemplate<String,String> redisTemplate;
     private final ObjectMapper objectMapper;
     private final ClienteSaldoRepository clienteSaldoRepository;
@@ -57,6 +58,8 @@ public class RedisUtils {
             Long centavos = valor.movePointRight(2).longValue();
             Long saldoPosDecremento = redisTemplate.opsForHash()
                     .increment(chave,tipoConta,-centavos);
+
+            redisTemplate.expire(chave,ttlCache);
 
             BigDecimal saldoEmReaisAtualizado = BigDecimal.valueOf(saldoPosDecremento).movePointLeft(2);
 
@@ -99,7 +102,15 @@ public class RedisUtils {
 
         if (Objects.nonNull(valorNoRedis)  ) {
             String dadoRedis = String.valueOf(valorNoRedis);
-            ClienteDTO clienteDTO = objectMapper.convertValue(dadoRedis,ClienteDTO.class);
+            ClienteDTO clienteDTO = new ClienteDTO();
+            BigDecimal valorSaldo = objectMapper.convertValue(dadoRedis, BigDecimal.class);
+
+            if(tipoConta.equals(CREDITO.name())){
+                clienteDTO.setSaldoCredito(valorSaldo);
+            }
+            if (tipoConta.equals(DEBITO.name())) {
+                clienteDTO.setSaldoDebito(valorSaldo);
+            }
             return Optional.of(clienteDTO);
         }
 
@@ -119,7 +130,7 @@ public class RedisUtils {
 
             redisTemplate.opsForHash().put(chave,DEBITO.name(),String.valueOf(debito));
             redisTemplate.opsForHash().put(chave,CREDITO.name(), String.valueOf(credito));
-        }
+     }
 
 
         public ClienteDTO buscaDadosNoBanco(Long idUsuario){

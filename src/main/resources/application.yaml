@@ -45,3 +45,6 @@ app:
       bindings:
         enviarTransacao-out-0:
           content-type: application/json
+
+  cache:
+    transacao-ttl: 3h
